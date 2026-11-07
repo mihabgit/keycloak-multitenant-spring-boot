@@ -1,0 +1,26 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Tokens say iss=http://localhost:8080/realms/<tenant>, the URL clients use.
+      KC_HOSTNAME: http://localhost:8080
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import:ro
+
+  api:
+    build: .
+    environment:
+      KEYCLOAK_PUBLIC_URL: http://localhost:8080
+      # Inside the Docker network the API reaches Keycloak by service name.
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
+    ports:
+      - "8081:8081"
+    depends_on:
+      - keycloak

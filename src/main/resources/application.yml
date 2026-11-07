@@ -1,0 +1,24 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: keycloak-multitenant-spring-boot
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+# One entry per tenant (Keycloak realm).
+# issuer      = value of the token's "iss" claim (what clients see)
+# jwk-set-uri = where this API fetches the realm's signing keys
+app:
+  tenants:
+    - id: acme
+      issuer: ${KEYCLOAK_PUBLIC_URL:http://localhost:8080}/realms/acme
+      jwk-set-uri: ${KEYCLOAK_INTERNAL_URL:http://localhost:8080}/realms/acme/protocol/openid-connect/certs
+    - id: globex
+      issuer: ${KEYCLOAK_PUBLIC_URL:http://localhost:8080}/realms/globex
+      jwk-set-uri: ${KEYCLOAK_INTERNAL_URL:http://localhost:8080}/realms/globex/protocol/openid-connect/certs
